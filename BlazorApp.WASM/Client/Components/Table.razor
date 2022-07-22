@@ -1,0 +1,39 @@
+﻿@using System.Diagnostics.CodeAnalysis
+<table class="table">
+        <thead>
+            <tr>
+                <SortableItemHeader ItemType="WeatherForecast" FieldType="DateTime" Text="Date" OnClick="SortBy" KeySelector="@((x) => x.Date)"/>
+                <SortableItemHeader ItemType="WeatherForecast" FieldType="int" Text="Temp. (C)" OnClick="SortBy" KeySelector="@((x) => x.TemperatureC)"/>
+                <SortableItemHeader ItemType="WeatherForecast" FieldType="int" Text="Temp. (F)" OnClick="SortBy" KeySelector="@((x) => x.TemperatureF)"/>
+                <th>Summary</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var forecast in Forecasts)
+            {
+                <tr>
+                    <td>@forecast.Date.ToShortDateString()</td>
+                    <td>@forecast.TemperatureC</td>
+                    <td>@forecast.TemperatureF</td>
+                    <td>@forecast.Summary</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+@code {
+    [Parameter, AllowNull]
+    public WeatherForecast[]? Forecasts { get; set; }
+
+    public void SortBy<T>(SortDetails<WeatherForecast, T> sortDetails)
+    {
+        if (sortDetails.SortDirection == SortDirection.Asc)
+        {
+            Forecasts = Forecasts?.OrderBy(sortDetails.KeySelector).ToArray();
+        }
+        else
+        {
+            Forecasts = Forecasts?.OrderByDescending(sortDetails.KeySelector).ToArray();
+        }
+    }
+}

@@ -1,0 +1,45 @@
+﻿@page "/counter"
+@inject SnackbarStateManager _snakcbarStateManager;
+
+<PageTitle>Counter</PageTitle>
+
+<h1>Counter</h1>
+
+<p role="status">Current count: @currentCount</p>
+
+<button class="btn btn-primary" @onclick="IncrementCount">Click me</button>
+
+<Link Href="#" Text="Test" />
+
+<Snackbar Visible="true">
+    Test
+</Snackbar>
+
+<ActionSnackbar>
+    <Content>
+        Snackbar
+    </Content>
+    <Actions>
+        <a @onclick="PauseSnackbar">Pause</a>
+        <a @onclick="HideSnackbar">Close</a>
+    </Actions>
+</ActionSnackbar>
+@code {
+    private int currentCount = 0;
+
+    private void IncrementCount()
+    {
+        currentCount++;
+        _snakcbarStateManager.ShowSnackbar();
+    }
+
+    private void PauseSnackbar()
+    {
+        _snakcbarStateManager.CancelDisposal();
+    }
+
+    private void HideSnackbar()
+    {
+        _snakcbarStateManager.HideSnackbar();
+    }
+}

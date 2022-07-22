@@ -1,0 +1,42 @@
+﻿@typeparam FieldType
+@typeparam ItemType
+
+<th class="header" @onclick="Clicked">
+    <div>
+        @Text (@if(_sortDirection != null) @_sortDirection.ToString())
+    </div>
+</th>
+
+    @code {
+    [Parameter, EditorRequired]
+    public string Text { get; set; } = string.Empty;
+
+    [Parameter, EditorRequired]
+    public EventCallback<SortDetails<ItemType, FieldType>> OnClick { get; set; }
+
+    [Parameter, EditorRequired]
+    public Func<ItemType, FieldType> KeySelector { get; set; } = null!;
+
+    private SortDirection? _sortDirection = null;
+
+    public async Task Clicked()
+    {
+        if (_sortDirection != null)
+        {
+            if (_sortDirection == SortDirection.Asc)
+            {
+                _sortDirection = SortDirection.Desc;
+            }
+            else
+            {
+                _sortDirection = SortDirection.Asc;
+            }
+        } else
+        {
+            _sortDirection = SortDirection.Asc;
+        }
+
+        var sortDetails = new SortDetails<ItemType, FieldType>(_sortDirection.Value, KeySelector);
+        await OnClick.InvokeAsync(sortDetails);
+    }
+}

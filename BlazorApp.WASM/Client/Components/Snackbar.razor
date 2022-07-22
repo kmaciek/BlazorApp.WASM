@@ -1,0 +1,68 @@
+﻿@inject SnackbarStateManager _snackBarStateManager;
+
+<div class="snackbar-container @(Visible == true ? "visible" : string.Empty )">
+    <div class="snackbar">
+        @ChildContent
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public bool Visible { get; set; } = false;
+
+    [Parameter]
+    public RenderFragment ChildContent { get; set; } = @<div></div>
+    ;
+
+    private CancellationTokenSource CancellationTokenSource = new CancellationTokenSource();
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        _snackBarStateManager.OnShowSnackbar += OnShowSnackBar;
+        _snackBarStateManager.OnHideSnackbar += OnHideSnackBar;
+        _snackBarStateManager.OnCancelDisposal += OnCancelDisposal;
+    }
+
+    private async Task OnShowSnackBar()
+    {
+        if (Visible)
+        {
+            return;
+        }
+
+        await ShowSnackBar();
+    }
+
+    private async Task ShowSnackBar()
+    {
+        Visible = true;
+        StateHasChanged();
+        CancellationTokenSource = new CancellationTokenSource();
+        await Task.Delay(TimeSpan.FromSeconds(10), CancellationTokenSource.Token)
+            .ContinueWith((task) =>
+            {
+                if (!task.IsCanceled)
+                {
+                    HideSnackBar();
+                }
+            });
+    }
+
+    private void OnHideSnackBar()
+    {
+        HideSnackBar();
+    }
+
+    private void HideSnackBar()
+    {
+        CancellationTokenSource?.Cancel();
+        Visible = false;
+        StateHasChanged();
+    }
+
+    private void OnCancelDisposal()
+    {
+        CancellationTokenSource?.Cancel();
+    }
+}
